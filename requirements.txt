@@ -1,4 +1,9 @@
 langchain
+
+# module 1
+pypdf
+yt_dlp
+pydub
+
 chromadb
 lark
-pypdf
