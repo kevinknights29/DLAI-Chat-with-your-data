@@ -1,4 +1,5 @@
 langchain
+openai
 
 # module 1
 pypdf
