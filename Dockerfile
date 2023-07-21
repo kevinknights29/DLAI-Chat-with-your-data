@@ -44,11 +44,24 @@ RUN pip install --no-cache-dir llama-cpp-python  && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
-# Install Jupyter Notebook extensions
-RUN pip install --no-cache-dir jupyter_contrib_nbextensions && \
-    jupyter contrib nbextension install --user && \
-    # can modify or enable additional extensions here
-    jupyter nbextension enable spellchecker/main --user && \
+# Extensions for JupyterLab can be found: https://jupyterlab-contrib.github.io/migrate_from_classical.html
+# Install JupyterLab LSP extension
+RUN pip install --no-cache-dir jupyterlab-lsp 'python-lsp-server[all]' && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
+
+# Install JupyterLab Code Formatter extension
+RUN pip install --no-cache-dir jupyterlab-code-formatter black isort && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
+
+# Install JupyterLab Execute Time extension
+RUN pip install --no-cache-dir jupyterlab_execute_time && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
+
+# Install JupyterLab Spell Checker extension
+RUN pip install --no-cache-dir jupyterlab-spellchecker && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
