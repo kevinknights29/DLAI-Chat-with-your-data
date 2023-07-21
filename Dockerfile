@@ -4,6 +4,7 @@
 FROM jupyter/scipy-notebook:latest
 LABEL authors="Kevin Knights | kevinknights29"
 
+ARG MODEL_FOLDER=llama-2
 ARG MODEL_FILENAME=llama-2-7b.ggmlv3.q4_0.bin
 ARG MODEL_URL=https://huggingface.co/TheBloke/Llama-2-7B-GGML/resolve/main/llama-2-7b.ggmlv3.q4_0.bin
 
@@ -22,14 +23,21 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         # deps for downloading model
         curl \
+        git \
         # deps for building python deps
         build-essential \
         python3-dev \
         gcc
 
-# Download Model
-RUN mkdir -p /opt/models && \
-    curl -L $MODEL_URL -o /opt/models/${MODEL_FILENAME}
+# Download Model - Llama-2-7B-GGML
+RUN mkdir -p /opt/models/${MODEL_FOLDER} && \
+    curl -L $MODEL_URL -o /opt/models/${MODEL_FOLDER}/${MODEL_FILENAME}
+
+# Download Model - Whisper.cpp
+RUN git clone https://github.com/ggerganov/whisper.cpp.git /opt/models/whisper && \
+    cd /opt/models/whisper && \
+    bash ./models/download-ggml-model.sh base.en && \
+    make base.en
 
 # Install llama-cpp package for python
 RUN pip install --no-cache-dir llama-cpp-python  && \
