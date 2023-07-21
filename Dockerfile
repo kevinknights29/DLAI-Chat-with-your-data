@@ -14,9 +14,6 @@ ENV JUPYTER_ENABLE_LAB=yes
 ENV CMAKE_ARGS="-DLLAMA_CUBLAS=on" \
     FORCE_CMAKE=1
 
-# Adding theme configuration to JupyterLab
-COPY ./overrides.json /opt/conda/share/jupyter/lab/settings/overrides.json
-
 # Switch to root to install packages
 USER root
 
@@ -31,14 +28,8 @@ RUN apt-get update \
         gcc
 
 # Download Model
-RUN mkdir -p /opt/models
-RUN curl -L $MODEL_URL -o /opt/models/${MODEL_FILENAME}
-
-# Install from the requirements.txt file
-COPY --chown=${NB_UID}:${NB_GID} requirements.txt /tmp/
-RUN pip install --no-cache-dir --requirement /tmp/requirements.txt && \
-    fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}"
+RUN mkdir -p /opt/models && \
+    curl -L $MODEL_URL -o /opt/models/${MODEL_FILENAME}
 
 # Install llama-cpp package for python
 RUN pip install --no-cache-dir llama-cpp-python  && \
@@ -50,5 +41,14 @@ RUN pip install --no-cache-dir jupyter_contrib_nbextensions && \
     jupyter contrib nbextension install --user && \
     # can modify or enable additional extensions here
     jupyter nbextension enable spellchecker/main --user && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
+
+# Adding theme configuration to JupyterLab
+COPY ./overrides.json /opt/conda/share/jupyter/lab/settings/overrides.json
+
+# Install from the requirements.txt file
+COPY --chown=${NB_UID}:${NB_GID} requirements.txt /tmp/
+RUN pip install --no-cache-dir --requirement /tmp/requirements.txt && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
